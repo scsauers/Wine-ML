@@ -16,7 +16,7 @@ X = wine_data.drop('quality', axis=1)
 y = wine_data['quality'] - wine_data['quality'].min()
 print("Data split completed.")
 print("Splitting data into training and testing sets...")
-X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2023)
+X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
 print("Data split into training and testing sets.")
 print("Standardizing the features...")
 scaler = StandardScaler()
@@ -50,7 +50,7 @@ X_test_combined = np.hstack((X_test_selected, X_test_interactions))
 print("Defining KNN classifier and parameters...")
 knn_classifier = KNeighborsClassifier()
 knn_param_grid = {
-    'n_neighbors': [10, 11, 12],  # Different vals for number of neighbors
+    'n_neighbors': [10, 11, 12],          # Different vals for number of neighbors
     'weights': ['distance'],
     'algorithm': ['auto'],
     'p': [1, 2, 2.5, 3, 4],  # Manhattan (p=1) and Euclidean (p=2) distances... others
