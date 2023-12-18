@@ -1,0 +1,56 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.inspection import permutation_importance
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+file_path = '/Users/scott/Downloads/wine+quality/winequality-red.csv'
+wine_data = pd.read_csv(file_path, delimiter=';')
+
+# Cor matrix
+correlation_matrix = wine_data.corr()
+plt.figure(figsize=(12, 10))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Matrix of Wine Quality Dataset')
+plt.show()
+
+# features and target
+X = wine_data.drop('quality', axis=1)
+y = wine_data['quality']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# RF
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+feature_importances = rf.feature_importances_
+importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': feature_importances})
+importance_df = importance_df.sort_values(by='Importance', ascending=False)
+plt.figure(figsize=(12, 6))
+sns.barplot(x='Importance', y='Feature', data=importance_df)
+plt.title('Feature Importances in Predicting Wine Quality')
+plt.show()
+
+perm_importance = permutation_importance(rf, X_test, y_test, n_repeats=10, random_state=42)
+perm_importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': perm_importance.importances_mean})
+perm_importance_df = perm_importance_df.sort_values(by='Importance', ascending=False)
+plt.figure(figsize=(12, 6))
+sns.barplot(x='Importance', y='Feature', data=perm_importance_df)
+plt.title('Permutation Feature Importances in Predicting Wine Quality')
+plt.show()
+
+fig, axes = plt.subplots(nrows=4, ncols=3, figsize=(15, 12))
+fig.suptitle('Histograms of All Features', fontsize=16)
+
+for i, column in enumerate(wine_data.columns):
+    ax = axes[i//3, i%3]
+    wine_data[column].hist(bins=20, ax=ax)
+    ax.set_title(column)
+    ax.set_xlabel('Value')
+    ax.set_ylabel('Frequency')
+
+plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+plt.show()
